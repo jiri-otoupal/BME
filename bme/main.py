@@ -89,7 +89,8 @@ def run(searched, regex, full_word_match, match_case, edit):
         chosen = found.pop()
 
     if edit:
-        inquirer.text("Command to execute", default=chosen)
+        chosen = inquirer.text("Edit command before executing: ",
+                               default=chosen).execute()
     rich.print(f"[red]Executing [/red][green]{chosen}[/green]")
     os.system(chosen)
 
