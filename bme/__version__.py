@@ -7,7 +7,7 @@ Information about the current version of the py-package-template package.
 
 __title__ = "bme"
 __description__ = (
-    "CLI Command making OCI Bastion and kubernetes usage simple and fast"
+    "Never use notepads or history for searching for your past commands. With BME you can bookmark your commands, search in your bookmarked commands and execute them with edit possibility before execution. "
 )
 
 __version__ = "1.0.0"

@@ -2,7 +2,8 @@
 
 (Bookmark my Executions/Commands)
 
-Save and reuse your frequent commands elegantly
+Never use notepads or history for searching for your past commands. With BME you can bookmark your commands, search in your bookmarked commands and
+execute them with edit possibility before execution.
 
 [![image](https://img.shields.io/pypi/v/bme.svg)](https://pypi.org/project/bme/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/bme)](https://pypi.org/project/bme/)
@@ -67,6 +68,7 @@ Basic search `bme run <searched>`
 Regex search `bme run <searched> -r <my-regex*>`
 
 ##### Optional flags:
+
 "-e" or "--edit" for editing command before execution
 
 `"-r <your-regex>" or "--regex <your-regex>"` for full word search only
