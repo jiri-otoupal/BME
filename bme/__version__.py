@@ -17,4 +17,4 @@ __license__ = "MIT"
 __url__ = "https://github.com/jiri-otoupal/bme"
 __pypi_repo__ = "https://pypi.org/project/bme"
 
-__version_name__ = "Kitten w/ helmet no CLI"
+__version_name__ = "Bookmarked Book"
