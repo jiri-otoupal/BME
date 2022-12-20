@@ -1,0 +1,6 @@
+/.idea/
+/bme.egg-info/
+/build/lib/bme/
+/dist/
+/creds.json
+errors.txt
