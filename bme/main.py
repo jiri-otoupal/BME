@@ -83,10 +83,14 @@ def run(searched, regex, full_word_match, match_case, edit):
         rich.print("[red]No Commands found[/red]")
         return
 
-    chosen = inquirer.select("Select cmd to execute:", found).execute()
-    rich.print(f"[red]Executing [/red][green]{chosen}[/green]")
+    if len(found) > 1:
+        chosen = inquirer.select("Select cmd to execute:", found).execute()
+    else:
+        chosen = found.pop()
+
     if edit:
         inquirer.text("Command to execute", default=chosen)
+    rich.print(f"[red]Executing [/red][green]{chosen}[/green]")
     os.system(chosen)
 
 

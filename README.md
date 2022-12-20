@@ -67,6 +67,7 @@ Basic search `bme run <searched>`
 Regex search `bme run <searched> -r <my-regex*>`
 
 ##### Optional flags:
+"-e" or "--edit" for editing command before execution
 
 `"-r <your-regex>" or "--regex <your-regex>"` for full word search only
 
