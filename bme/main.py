@@ -8,6 +8,7 @@ from InquirerPy import inquirer
 from bme.__version__ import __version_name__, __version__
 from bme.bookmark import Bookmark
 from bme.convertor import get_cmd_str
+from bme.historitian.historitian import History
 from bme.init import init_all
 from bme.notifier.version_notifier import Notifier
 
@@ -93,6 +94,7 @@ def run(searched, regex, full_word_match, match_case, edit):
                                default=chosen).execute()
     rich.print(f"[red]Executing [/red][green]{chosen}[/green]")
     os.system(chosen)
+    History.add_cmd(chosen)
 
 
 def main():
