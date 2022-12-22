@@ -8,7 +8,6 @@ execute them with edit possibility before execution.
 [![image](https://img.shields.io/pypi/v/bme.svg)](https://pypi.org/project/bme/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/bme)](https://pypi.org/project/bme/)
 [![Downloads](https://pepy.tech/badge/bme)](https://pepy.tech/project/bme)
-[![Upload Python Package](https://github.com/jiri-otoupal/BME/actions/workflows/python-publish.yml/badge.svg)](https://github.com/jiri-otoupal/BME/actions/workflows/python-publish.yml)
 
 ### Supported
 
