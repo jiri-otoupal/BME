@@ -78,7 +78,6 @@ def run(searched, regex, full_word_match, match_case, edit):
                                default=chosen).execute()
     rich.print(f"[red]Executing [/red][green]{chosen}[/green]")
     os.system(chosen)
-    History.add_cmd(chosen)
 
 
 @cli.command("list")
