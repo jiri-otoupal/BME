@@ -1,2 +1,8 @@
+import collections
+
+
 def get_cmd_str(cmd: list):
-    return ' '.join(cmd)
+    if type(cmd) is not str:
+        return ' '.join(cmd)
+    else:
+        return cmd

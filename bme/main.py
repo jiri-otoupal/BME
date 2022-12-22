@@ -56,29 +56,13 @@ def rm(command):
 @click.option("-e", "--edit", help="Edit command before execution", default=False,
               is_flag=True)
 def run(searched, regex, full_word_match, match_case, edit):
-    if match_case:
-        cmd_str = get_cmd_str(searched)
-    else:
-        cmd_str = get_cmd_str(searched).lower()
+    bookmarks, cmd_str, found = prepare_cmd_str(match_case, searched)
 
-    bookmarks = Bookmark.load_all()
-    found = set()
-
-    for bookmark in bookmarks["cmds"]:
-        if match_case:
-            b_tmp = bookmark
-        else:
-            b_tmp = bookmark.lower()
-
-        try:
-            if regex is None and (len(set(searched).intersection(
-                    b_tmp.split(" "))) or (not full_word_match and cmd_str in b_tmp)):
-                found.add(bookmark)
-            elif regex and re.findall(regex, b_tmp):
-                found.add(bookmark)
-        except re.error as ex:
-            rich.print(f"[red]Regex Error: {ex.msg}, stopping[/red]")
-            return
+    found = browse_bookmarks(bookmarks, cmd_str, found, full_word_match, match_case,
+                             regex,
+                             searched)
+    if found is None:
+        return
 
     if not len(found):
         rich.print("[red]No Commands found[/red]")
@@ -95,6 +79,65 @@ def run(searched, regex, full_word_match, match_case, edit):
     rich.print(f"[red]Executing [/red][green]{chosen}[/green]")
     os.system(chosen)
     History.add_cmd(chosen)
+
+
+@cli.command("list")
+@click.argument("searched", required=False, default=None)
+@click.option("-r", "--regex", help="Regex string to check with, please use quotes",
+              required=False,
+              default=None)
+@click.option("-w", "--full-word-match", help="Only full word matching", default=False,
+              is_flag=True)
+@click.option("-m", "--match-case", help="Match Case", default=False, is_flag=True)
+def cmd_list(searched, regex, full_word_match, match_case):
+    if searched is not None:
+        bookmarks, cmd_str, found = prepare_cmd_str(match_case, searched)
+
+        found = browse_bookmarks(bookmarks, cmd_str, found, full_word_match, match_case,
+                                 regex,
+                                 searched)
+        if found is None:
+            return
+
+    else:
+        found = Bookmark.load_all()["cmds"]
+
+    if not len(found):
+        rich.print("[red]No Commands found[/red]")
+        return
+
+    rich.print("Commands:")
+    rich.print("\n".join(found))
+
+
+def browse_bookmarks(bookmarks, cmd_str, found, full_word_match, match_case, regex,
+                     searched):
+    for bookmark in bookmarks["cmds"]:
+        if match_case:
+            b_tmp = bookmark
+        else:
+            b_tmp = bookmark.lower()
+
+        try:
+            if regex is None and (len(set(searched).intersection(
+                    b_tmp.split(" "))) or (not full_word_match and cmd_str in b_tmp)):
+                found.add(bookmark)
+            elif regex and re.findall(regex, b_tmp):
+                found.add(bookmark)
+        except re.error as ex:
+            rich.print(f"[red]Regex Error: {ex.msg}, stopping[/red]")
+            return None
+    return found
+
+
+def prepare_cmd_str(match_case, searched):
+    if match_case:
+        cmd_str = get_cmd_str(searched)
+    else:
+        cmd_str = get_cmd_str(searched).lower()
+    bookmarks = Bookmark.load_all()
+    found = set()
+    return bookmarks, cmd_str, found
 
 
 def main():
