@@ -48,6 +48,7 @@ def rm(command):
     """
     Removes command from database, provided command needs to be exactly same
 
+
     Example:
 
     bme rm ssh jiri@192.168.1.0
@@ -77,6 +78,13 @@ def rm(command):
 def run(searched, regex, full_word_match, match_case, edit):
     """
     This will run command, argument is used for search in commands for a match
+
+    Optional flags:
+
+    "-e" or "--edit" for editing command before execution
+    "-r <your-regex>" or "--regex <your-regex>"` for full word search only
+    "-f" or "--full-word" for full word search only
+    "-m" or "--match-case" for search with matching case
 
     Example:
 
@@ -126,6 +134,13 @@ def run(searched, regex, full_word_match, match_case, edit):
 def cmd_list(searched, regex, full_word_match, match_case):
     """
     This will list commands, if argument is used search in text is applied to results
+
+    Optional flags:
+
+    "-e" or "--edit" for editing command before execution
+    "-r <your-regex>" or "--regex <your-regex>"` for full word search only
+    "-f" or "--full-word" for full word search only
+    "-m" or "--match-case" for search with matching case
 
     Example:
 
