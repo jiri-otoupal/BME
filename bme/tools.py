@@ -6,6 +6,13 @@ from bme.bookmark import Bookmark
 from bme.convertor import get_cmd_str
 
 
+def highlight(full_str: str, sub_str: str, color: str):
+    f_list = list(full_str)
+    f_list.insert(full_str.index(sub_str), f"[{color}]")
+    f_list.insert(full_str.index(sub_str) + len(sub_str) + 1, f"[/{color}]")
+    return "".join(f_list)
+
+
 def browse_bookmarks(bookmarks, cmd_str, found, full_word_match, match_case, regex,
                      searched):
     for bookmark in bookmarks["cmds"]:
