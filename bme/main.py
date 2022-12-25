@@ -9,7 +9,7 @@ from bme.bookmark import Bookmark
 from bme.convertor import get_cmd_str
 from bme.init import init_all
 from bme.notifier.version_notifier import Notifier
-from bme.tools import browse_bookmarks, prepare_cmd_str
+from bme.tools import browse_bookmarks, prepare_cmd_str, highlight
 
 
 @click.group()
@@ -166,23 +166,25 @@ def cmd_list(searched, regex, full_word_match, match_case):
     @return:
     """
     if searched is not None:
-        bookmarks, cmd_str, found = prepare_cmd_str(match_case, searched)
+        bookmarks, cmd_str, found_cmds = prepare_cmd_str(match_case, searched)
 
-        found = browse_bookmarks(bookmarks, cmd_str, found, full_word_match, match_case,
-                                 regex,
-                                 searched)
-        if found is None:
+        found_cmds = browse_bookmarks(bookmarks, cmd_str, found_cmds, full_word_match,
+                                      match_case,
+                                      regex,
+                                      searched)
+        if found_cmds is None:
             return
 
     else:
-        found = Bookmark.load_all()["cmds"]
+        found_cmds = Bookmark.load_all()["cmds"]
 
-    if not len(found):
+    if not len(found_cmds):
         rich.print("[red]No Commands found[/red]")
         return
 
     rich.print("Commands:")
-    rich.print("\n".join(found))
+    for found_cmd in found_cmds:
+        rich.print(highlight(found_cmd, searched, "red"))
 
 
 def main():
