@@ -13,6 +13,15 @@ def highlight(full_str: str, sub_str: str, color: str):
     return "".join(f_list)
 
 
+def highlight_regex(full_str: str, regex_str: str, color: str):
+    f_list = list(full_str)
+    for m in re.finditer(regex_str, full_str):
+        start, end = (m.start(0), m.end(0))
+        f_list.insert(start, f"[{color}]")
+        f_list.insert(end + 1, f"[/{color}]")
+    return "".join(f_list)
+
+
 def browse_bookmarks(bookmarks, cmd_str, found, full_word_match, match_case, regex,
                      searched):
     for bookmark in bookmarks["cmds"]:
@@ -34,6 +43,8 @@ def browse_bookmarks(bookmarks, cmd_str, found, full_word_match, match_case, reg
 
 
 def prepare_cmd_str(match_case, searched):
+    if searched is None:
+        searched = []
     if match_case:
         cmd_str = get_cmd_str(searched)
     else:

@@ -9,7 +9,7 @@ from bme.bookmark import Bookmark
 from bme.convertor import get_cmd_str
 from bme.init import init_all
 from bme.notifier.version_notifier import Notifier
-from bme.tools import browse_bookmarks, prepare_cmd_str, highlight
+from bme.tools import browse_bookmarks, prepare_cmd_str, highlight, highlight_regex
 
 
 @click.group()
@@ -93,6 +93,7 @@ def run(searched, regex, full_word_match, match_case, edit):
     Use following to execute command
     bme run ssh or bme run jiri@192 or bme run <whatever matches in command>
 
+    @param edit: This flag will allow to edit before exec
     @param searched: Searched text in commands
     @param regex: Regex string to use to filter, can not be used together with argument
     @param full_word_match: If match only full words
@@ -165,7 +166,8 @@ def cmd_list(searched, regex, full_word_match, match_case):
     @param match_case: If false(default) no case is considered during search
     @return:
     """
-    if searched is not None:
+    if searched is not None or regex is not None:
+
         bookmarks, cmd_str, found_cmds = prepare_cmd_str(match_case, searched)
 
         found_cmds = browse_bookmarks(bookmarks, cmd_str, found_cmds, full_word_match,
@@ -184,7 +186,10 @@ def cmd_list(searched, regex, full_word_match, match_case):
 
     rich.print("Commands:")
     for found_cmd in found_cmds:
-        rich.print(highlight(found_cmd, searched, "red"))
+        if not regex:
+            rich.print(highlight(found_cmd, searched, "red"))
+        else:
+            rich.print(highlight_regex(found_cmd, regex, "red"))
 
 
 def main():
