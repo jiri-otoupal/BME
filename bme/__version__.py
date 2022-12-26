@@ -10,7 +10,7 @@ __description__ = (
     "Never use notepads or history for searching for your past commands. With BME you can bookmark your commands, search in your bookmarked commands and execute them with edit possibility before execution. "
 )
 
-__version__ = "1.0.8"
+__version__ = "1.0.9"
 __author__ = "Jiri Otoupal"
 __author_email__ = "jiri-otoupal@ips-database.eu"
 __license__ = "MIT"
