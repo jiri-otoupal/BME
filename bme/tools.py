@@ -1,4 +1,5 @@
 import re
+from typing import Optional
 
 import rich
 
@@ -6,19 +7,21 @@ from bme.bookmark import Bookmark
 from bme.convertor import get_cmd_str
 
 
-def highlight(full_str: str, sub_str: str, color: str):
+def highlight(full_str: str, sub_str: Optional[str], color: str):
     f_list = list(full_str)
-    f_list.insert(full_str.index(sub_str), f"[{color}]")
-    f_list.insert(full_str.index(sub_str) + len(sub_str) + 1, f"[/{color}]")
+    if sub_str:
+        f_list.insert(full_str.index(sub_str), f"[{color}]")
+        f_list.insert(full_str.index(sub_str) + len(sub_str) + 1, f"[/{color}]")
     return "".join(f_list)
 
 
-def highlight_regex(full_str: str, regex_str: str, color: str):
+def highlight_regex(full_str: str, regex_str: Optional[str], color: str):
     f_list = list(full_str)
-    for m in re.finditer(regex_str, full_str):
-        start, end = (m.start(0), m.end(0))
-        f_list.insert(start, f"[{color}]")
-        f_list.insert(end + 1, f"[/{color}]")
+    if regex_str:
+        for m in re.finditer(regex_str, full_str):
+            start, end = (m.start(0), m.end(0))
+            f_list.insert(start, f"[{color}]")
+            f_list.insert(end + 1, f"[/{color}]")
     return "".join(f_list)
 
 
