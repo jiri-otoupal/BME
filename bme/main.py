@@ -265,8 +265,9 @@ def sequence_run(sequence_name, verbose):
     if Sequence.execute(sequence_name, verbose=verbose):
         pass
     else:
-        rich.print(f"[red]Sequence does not exist '[white]{sequence}[/white]', exiting..."
-                   f"[/red]")
+        rich.print(
+            f"[red]Sequence does not exist '[white]{sequence_name}[/white]', exiting..."
+            f"[/red]")
 
 
 def get_correct_sequence(sequence_name):
