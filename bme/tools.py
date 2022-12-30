@@ -1,9 +1,11 @@
 import re
+from pathlib import Path
 from typing import Optional
 
 import rich
+from InquirerPy import inquirer
 
-from bme.bookmark import Bookmark
+from bme.saved_types.bookmark import Bookmark
 from bme.convertor import get_cmd_str
 
 
@@ -26,8 +28,13 @@ def highlight_regex(full_str: str, regex_str: Optional[str], color: str):
 
 
 def browse_bookmarks(bookmarks, cmd_str, found, full_word_match, match_case, regex,
-                     searched):
-    for bookmark in bookmarks["cmds"]:
+                     searched, root_key=None):
+    if root_key:
+        tmp_bookmarks = bookmarks[root_key]["cmds"]
+    else:
+        tmp_bookmarks = bookmarks["cmds"]
+
+    for bookmark in tmp_bookmarks:
         if match_case:
             b_tmp = bookmark
         else:
@@ -45,13 +52,32 @@ def browse_bookmarks(bookmarks, cmd_str, found, full_word_match, match_case, reg
     return found
 
 
-def prepare_cmd_str(match_case, searched):
+def prepare_cmd_str(match_case, searched, location: Path):
     if searched is None:
         searched = []
     if match_case:
         cmd_str = get_cmd_str(searched)
     else:
         cmd_str = get_cmd_str(searched).lower()
-    bookmarks = Bookmark.load_all()
+    bookmarks = Bookmark.load_all(location)
     found = set()
     return bookmarks, cmd_str, found
+
+
+def process_found_n_remove(found, location, root_key=None):
+    if found is None or not len(found):
+        rich.print("[red]No Commands found[/red]")
+        return
+    if len(found) > 1:
+        chosen = inquirer.select("Select cmd to remove:", found).execute()
+    else:
+        chosen = found.pop()
+    if inquirer.confirm(f"Do you really want to delete command: '{chosen}'").execute():
+        Bookmark.remove(chosen, location, root_key=root_key)
+    else:
+        rich.print("Nothing removed")
+        return
+    if chosen not in Bookmark.load_all(location):
+        rich.print(f"[green]Removed '{chosen}' Successfully[/green]")
+    else:
+        rich.print(f"[red]Failed to remove '{chosen}'[/red]")

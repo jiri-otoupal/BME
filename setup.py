@@ -27,7 +27,7 @@ setup(
     include_package_data=True,
     python_requires=">=3.7,<4",
     install_requires=["click", "rich", "inquirerpy", "eventlet", "lastversion",
-                      "requests", "semantic_version"],
+                      "requests", "semantic_version", "escapejson"],
     extras_require={
         "dev": ["black==22.*"],
     },
