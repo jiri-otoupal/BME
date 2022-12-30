@@ -43,8 +43,14 @@ def add(command):
 
 @cli.command("rm", help="Removes Bookmark of argument, use of quotes is optional",
              context_settings=dict(ignore_unknown_options=True))
-@click.argument("command", nargs=-1)
-def rm(command):
+@click.argument("searched", nargs=-1)
+@click.option("-r", "--regex", help="Regex string to check with, please use quotes",
+              required=False,
+              default=None)
+@click.option("-w", "--full-word-match", help="Only full word matching", default=False,
+              is_flag=True)
+@click.option("-m", "--match-case", help="Match Case", default=False, is_flag=True)
+def rm(searched, regex, full_word_match, match_case):
     """
     Removes command from database, provided command needs to be exactly same
 
@@ -53,15 +59,52 @@ def rm(command):
 
     bme rm ssh jiri@192.168.1.0
 
-    @param command: Command to add, use quotes around command optionally
+    Optional flags:
+
+    "-r <your-regex>" or "--regex <your-regex>"` for full word search only
+    "-f" or "--full-word" for full word search only
+    "-m" or "--match-case" for search with matching case
+
+    Example:
+
+    In DB there is 'ssh jiri@192.168.1.0' command
+
+    Use following to execute command
+    bme run ssh or bme run jiri@192 or bme run <whatever matches in command>
+
+    @param searched: Searched text in commands
+    @param regex: Regex string to use to filter, can not be used together with argument
+    @param full_word_match: If match only full words
+    @param match_case: If false(default) no case is considered during search
     @return:
     """
-    cmd_str = get_cmd_str(command)
-    if Bookmark.remove(" ".join(command)):
-        rich.print(f"[green]Removed Bookmark '[white]{cmd_str}[/white]'[/green]")
+    bookmarks, cmd_str, found = prepare_cmd_str(match_case, searched)
+
+    found = browse_bookmarks(bookmarks, cmd_str, found, full_word_match, match_case,
+                             regex,
+                             searched)
+    if found is None:
+        return
+
+    if not len(found):
+        rich.print("[red]No Commands found[/red]")
+        return
+
+    if len(found) > 1:
+        chosen = inquirer.select("Select cmd to remove:", found).execute()
     else:
-        rich.print(
-            f"[red]Bookmark '[white]{cmd_str}[/white]' not found, nothing changed[/red]")
+        chosen = found.pop()
+
+    if inquirer.confirm(f"Do you really want to delete command: '{chosen}'").execute():
+        Bookmark.remove(chosen)
+    else:
+        rich.print("Nothing removed")
+        return
+
+    if chosen not in Bookmark.load_all():
+        rich.print(f"[green]Removed '{chosen}' Successfully[/green]")
+    else:
+        rich.print(f"[red]Failed to remove '{chosen}'[/red]")
 
 
 @cli.command("run", help="Searches and Runs Bookmark of your selection",
