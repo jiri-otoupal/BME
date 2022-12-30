@@ -187,6 +187,19 @@ def sequence_add(sequence_name, command):
     @param command: Command to add, use quotes around command optionally
     @return:
     """
+    if not command:
+        rich.print(
+            f"[red]Can not add empty command to sequence [/red]'[white]{sequence_name}[/white]'")
+        return
+    sequences = Sequence.load_all(default_sequences_location).keys()
+
+    if sequence_name not in sequences:
+        rich.print(
+            f"[red]Did not found searched sequence '[white]{sequence_name}[/white]'.[/red]")
+        if len(sequences):
+            sequence_name = inquirer.select("Please select sequence", sequences).execute()
+        else:
+            rich.print("No sequences in DB")
     cmd_str = get_cmd_str(command)
     if Sequence.add_cmd(sequence_name, cmd_str):
         rich.print(
@@ -223,9 +236,19 @@ def sequence_pop(sequence_name, searched, regex, full_word_match, match_case):
     bookmarks, cmd_str, found = prepare_cmd_str(match_case, searched,
                                                 default_sequences_location)
 
-    if sequence_name not in bookmarks.keys():
-        rich.print(f"[red]Did not found sequence '[white]{sequence_name}[/white]'[/red]")
+    if not searched:
+        rich.print(
+            f"[red]Can not remove empty command from sequence [/red]'[white]{sequence_name}[/white]'")
         return
+    sequences = Sequence.load_all(default_sequences_location).keys()
+
+    if sequence_name not in sequences:
+        rich.print(
+            f"[red]Did not found searched sequence '[white]{sequence_name}[/white]'.[/red]")
+        if len(sequences):
+            sequence_name = inquirer.select("Please select sequence", sequences).execute()
+        else:
+            rich.print("No sequences in DB")
 
     found = browse_bookmarks(bookmarks, cmd_str, found, full_word_match, match_case,
                              regex,
