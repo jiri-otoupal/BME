@@ -5,8 +5,10 @@ from typing import Optional
 import rich
 from InquirerPy import inquirer
 
+from bme.config import default_sequences_location
 from bme.saved_types.bookmark import Bookmark
 from bme.convertor import get_cmd_str
+from bme.saved_types.sequence import Sequence
 
 
 def highlight(full_str: str, sub_str: Optional[str], color: str):
@@ -81,3 +83,15 @@ def process_found_n_remove(found, location, root_key=None):
         rich.print(f"[green]Removed '{chosen}' Successfully[/green]")
     else:
         rich.print(f"[red]Failed to remove '{chosen}'[/red]")
+
+
+def get_correct_sequence(sequence_name):
+    sequences = Sequence.load_all(default_sequences_location).keys()
+    if sequence_name not in sequences:
+        rich.print(
+            f"[red]Did not found searched sequence '[white]{sequence_name}[/white]'.[/red]")
+        if len(sequences):
+            sequence_name = inquirer.select("Please select sequence", sequences).execute()
+        else:
+            rich.print("No sequences in DB")
+    return sequence_name

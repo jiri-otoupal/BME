@@ -12,7 +12,7 @@ from bme.init import init_all
 from bme.notifier.version_notifier import Notifier
 from bme.saved_types.sequence import Sequence
 from bme.tools import browse_bookmarks, prepare_cmd_str, highlight, highlight_regex, \
-    process_found_n_remove
+    process_found_n_remove, get_correct_sequence
 
 
 @click.group()
@@ -268,18 +268,6 @@ def sequence_run(sequence_name, verbose):
         rich.print(
             f"[red]Sequence does not exist '[white]{sequence_name}[/white]', exiting..."
             f"[/red]")
-
-
-def get_correct_sequence(sequence_name):
-    sequences = Sequence.load_all(default_sequences_location).keys()
-    if sequence_name not in sequences:
-        rich.print(
-            f"[red]Did not found searched sequence '[white]{sequence_name}[/white]'.[/red]")
-        if len(sequences):
-            sequence_name = inquirer.select("Please select sequence", sequences).execute()
-        else:
-            rich.print("No sequences in DB")
-    return sequence_name
 
 
 @cli.command("add", help="Adds Bookmark, use of quotes is optional",
