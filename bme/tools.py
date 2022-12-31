@@ -4,6 +4,7 @@ from typing import Optional
 
 import rich
 from InquirerPy import inquirer
+from watchdog.events import FileSystemEventHandler
 
 from bme.config import default_sequences_location
 from bme.saved_types.bookmark import Bookmark
@@ -95,3 +96,20 @@ def get_correct_sequence(sequence_name):
         else:
             rich.print("No sequences in DB")
     return sequence_name
+
+
+class FileModifiedHandler(FileSystemEventHandler):
+
+    def __init__(self, path: Path, callback):
+        self.file_name = path
+        self.callback = callback
+        from watchdog.observers import Observer
+        # set observer to watch for changes in the directory
+        self.observer = Observer()
+        self.observer.schedule(self, str(path.parent), recursive=False)
+        self.observer.start()
+        self.observer.join()
+
+    def on_modified(self, event):
+        # only act on the change that we're looking for
+        self.callback()  # call callback

@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import click
 import rich
@@ -6,13 +7,13 @@ from InquirerPy import inquirer
 
 from bme.__version__ import __version_name__, __version__
 from bme.config import default_sequences_location, default_bookmarks_location
-from bme.saved_types.bookmark import Bookmark
 from bme.convertor import get_cmd_str
 from bme.init import init_all
 from bme.notifier.version_notifier import Notifier
+from bme.saved_types.bookmark import Bookmark
 from bme.saved_types.sequence import Sequence
 from bme.tools import browse_bookmarks, prepare_cmd_str, highlight, highlight_regex, \
-    process_found_n_remove, get_correct_sequence
+    process_found_n_remove, get_correct_sequence, FileModifiedHandler
 
 
 @click.group()
@@ -242,6 +243,32 @@ def sequence_pop(sequence_name, searched, regex, full_word_match, match_case):
                              searched, sequence_name)
 
     process_found_n_remove(found, default_sequences_location, sequence_name)
+
+
+@sequence.command("watch", help="Adds Command to sequence, use of quotes is optional",
+                  context_settings=dict(ignore_unknown_options=True))
+@click.argument("sequence_name", type=str)
+@click.argument("file", type=str)
+@click.option("-v", "--verbose", required=False, help="Verbose execution of commands")
+def sequence_watch(sequence_name, file, verbose):
+    """
+    Sequence will watch every time supplied file is modified
+
+    Example:
+
+    bme sequence run my_sequence
+
+    @param file:
+    @param sequence_name:
+    @return:
+    """
+    if not Path(file).exists():
+        rich.print(f"File does not exist in path {file}")
+        return
+
+    sequence_name = get_correct_sequence(sequence_name)
+    callback = lambda: Sequence.execute(sequence_name, verbose=verbose)
+    FileModifiedHandler(Path(file).absolute(), callback)
 
 
 @sequence.command("run", help="Adds Command to sequence, use of quotes is optional",
