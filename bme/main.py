@@ -13,7 +13,7 @@ from bme.notifier.version_notifier import Notifier
 from bme.saved_types.bookmark import Bookmark
 from bme.saved_types.sequence import Sequence
 from bme.tools import browse_bookmarks, prepare_cmd_str, highlight, highlight_regex, \
-    process_found_n_remove, get_correct_sequence, FileModifiedHandler, convert_arguments
+    process_found_n_remove, get_correct_sequence, FileModifiedHandler, format_command
 
 
 @click.group()
@@ -61,11 +61,11 @@ def create_seq(name):
 @click.argument("name", type=str)
 def remove_seq(name):
     """
-    Creates Sequence
+    Removes Sequence
 
     Example:
 
-    bme sequence create my_sequence
+    bme sequence rm my_sequence
 
     @param name: Name of sequence to create
     @return:
@@ -201,7 +201,7 @@ def sequence_add(sequence_name, command):
 
     Example:
 
-    bme sequence add ssh jiri@192.168.1.0
+    bme sequence add my_sequence ssh jiri@192.168.1.0
 
     @param sequence_name: Name of sequence
     @param command: Command to add, use quotes around command optionally
@@ -275,7 +275,7 @@ def sequence_watch(sequence_name, file, verbose):
 
     Example:
 
-    bme sequence run my_sequence
+    bme sequence watch my_sequence file_path
 
     @param file:
     @param sequence_name:
@@ -450,20 +450,7 @@ def run(searched, arguments, regex, full_word_match, match_case, edit):
         chosen = inquirer.text("Edit command before executing: ",
                                default=chosen).execute()
     rich.print(f"[red]Executing [/red][green]{chosen}[/green]")
-    if len(arguments):
-        try:
-            convert = convert_arguments(arguments)
-            if convert[1]:
-                final = chosen.format(**convert[0])
-            else:
-                final = chosen.format(*convert[0])
-        except KeyError:
-            rich.print(
-                "[red]Key does not exist in command, or you used quotes without escaping. "
-                "Please always escape quotes with \\\"")
-            exit(1)
-    else:
-        final = chosen
+    final = format_command(arguments, chosen)
     os.system(final)
 
 

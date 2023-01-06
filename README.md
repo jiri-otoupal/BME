@@ -37,7 +37,7 @@ or
 pip3 install bme
 ```
 
-## All your commands are saved in ''
+## All your commands are saved in '~/.bme/bookmarks.json'
 
 ## Usage:
 
@@ -45,30 +45,24 @@ pip3 install bme
 
 _(Quotas can be used)_
 
-```bash
-
+```
 bme add <your command>
-
 ```
 
 #### For Removing bookmark:
 
 _(Quotas can be used)_
 
-```bash
-
+```
 bme rm <your command>
-
 ```
 
 #### For List bookmarks:
 
 _(Quotas can be used)_
 
-```bash
-
+```
 bme list <searched>
-
 ```
 
 * searched is optional, only if you want to list specific commands
@@ -79,6 +73,37 @@ bme list <searched>
 Basic search `bme run <searched>`
 
 Regex search `bme run <searched> -r <my-regex*>`
+
+##### Formatting support:
+
+You can format command from bookmark with python formatting as such
+
+* Use {} to be placeholder for your tuple arguments
+* Use {name} to be placeholder with key name for your dictionary arguments
+
+**Mixing tuple and dict arguments is not supported!**
+
+Example:
+
+Tuple:
+
+```
+bme add echo "Hello {} !"
+bme run ec Jiri
+```
+
+Dictionary arguments:
+
+```
+bme add echo "Hello {name} from {location}"
+bme run ec name=Jiri location=Prague
+```
+
+**or**
+
+```
+bme run ec name=\"Jiri\" location=\"Prague\"
+```
 
 ##### Optional flags:
 
@@ -92,10 +117,106 @@ Regex search `bme run <searched> -r <my-regex*>`
 
 _(Quotas can be used)_
 
-```bash
-
+```
 bme run <your command>
+```
 
+## Sequences
+
+Sequences are like scripts, except you don't have to search for location and manage them with different `.bashrc` or different OS specific files.
+Also thanks to this, you don't have to add them to PATH.
+
+BME will take care of storing your sequences in your `~/.bme` folder and will help you to search in them.
+These sequences work from everywhere and execution is always in your current working directory.
+
+### Commands:
+
+**Create Sequence**
+
+`bme sequence create {name}`
+
+Example:
+
+`bme sequence create my_sequence`
+
+**Remove Sequence**
+
+`bme sequence rm {name}`
+
+Example
+
+`bme sequence rm my_sequence`
+
+**Edit Sequence**
+
+`bme sequence edit`
+
+This will display location of json with sequences
+
+**Add Command to Sequence**
+
+This will add command to sequence with use of variadic arguments
+
+    bme sequence add {sequence_name} {command...}
+
+Example:
+
+    bme sequence add my_sequence ssh jiri@192.168.1.0
+
+**Pop Command from Sequence**
+
+This will pop command from sequence with use of variadic arguments
+
+    bme sequence pop {sequence_name} {command...}
+
+Example:
+
+    bme sequence pop my_sequence ssh jiri@192.168.1.0
+
+**Sequence Run**
+
+Runs supplied sequence, and will do search for you if not found
+
+    bme sequence run {sequence_name}
+
+**Sequence Watch (!BETA!)**
+
+Launches sequence on file modify
+
+    bme sequence watch {sequence_name} {file_path}
+
+**List Sequence**
+
+This will list commands and sequences, if argument is used search in text is applied to results
+
+Optional flags:
+
+    "-r <your-regex>" or "--regex <your-regex>"` for full word search only
+    "-f" or "--full-word" for full word search only
+    "-m" or "--match-case" for search with matching case
+
+Example Data:
+
+    In sequence DB there is:
+     'ssh jiri@192.168.1.0' command
+     'ssh jiri@192.168.1.55' command
+     'scp jiri@192.168.1.55' command
+
+Command `bme sequence list` will list all the sequences and their commands
+
+Specific listing format:
+
+    bme sequence list <optional commands that match this to list>
+
+Example:
+
+    bme sequence list ssh
+
+Output:
+
+```        
+'ssh jiri@192.168.1.0' command
+'ssh jiri@192.168.1.55' command
 ```
 
 <hr>

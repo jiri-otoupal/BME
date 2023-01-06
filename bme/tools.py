@@ -129,3 +129,21 @@ def convert_arguments(args: tuple) -> Union[Tuple[dict, bool], Tuple[tuple, bool
         return res_d, True
     else:
         return args, False
+
+
+def format_command(arguments, chosen):
+    if len(arguments):
+        try:
+            convert = convert_arguments(arguments)
+            if convert[1]:
+                final = chosen.format(**convert[0])
+            else:
+                final = chosen.format(*convert[0])
+        except KeyError:
+            rich.print(
+                "[red]Key does not exist in command, or you used quotes without escaping. "
+                "Please always escape quotes with \\\"")
+            exit(1)
+    else:
+        final = chosen
+    return final
