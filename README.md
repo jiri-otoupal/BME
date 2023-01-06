@@ -179,6 +179,17 @@ Runs supplied sequence, and will do search for you if not found
 
     bme sequence run {sequence_name}
 
+Sequence does support formatting of dynamic arguments same way as bookmarks
+these arguments will be passed to every command for formatting
+
+Example:
+
+    bme sequence run my_sequence John
+
+or
+
+    bme sequence run my_sequence name=John
+
 **Sequence Watch (!BETA!)**
 
 Launches sequence on file modify

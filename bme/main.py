@@ -293,8 +293,10 @@ def sequence_watch(sequence_name, file, verbose):
 @sequence.command("run", help="Adds Command to sequence, use of quotes is optional",
                   context_settings=dict(ignore_unknown_options=True))
 @click.argument("sequence_name", type=str)
+@click.argument("arguments", nargs=-1, type=click.UNPROCESSED, required=False,
+                default=None)
 @click.option("-v", "--verbose", required=False, help="Verbose execution of commands")
-def sequence_run(sequence_name, verbose):
+def sequence_run(sequence_name, arguments, verbose):
     """
     Adds command supplied in argument
 
@@ -302,13 +304,14 @@ def sequence_run(sequence_name, verbose):
 
     bme sequence run my_sequence
 
+    @param arguments: Arguments for formatting
     @param sequence_name:
     @param verbose:
     @return:
     """
     sequence_name = get_correct_sequence(sequence_name)
 
-    if Sequence.execute(sequence_name, verbose=verbose):
+    if Sequence.execute(sequence_name, arguments=arguments, verbose=verbose):
         pass
     else:
         rich.print(
