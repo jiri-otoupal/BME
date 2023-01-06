@@ -13,7 +13,7 @@ from bme.notifier.version_notifier import Notifier
 from bme.saved_types.bookmark import Bookmark
 from bme.saved_types.sequence import Sequence
 from bme.tools import browse_bookmarks, prepare_cmd_str, highlight, highlight_regex, \
-    process_found_n_remove, get_correct_sequence, FileModifiedHandler
+    process_found_n_remove, get_correct_sequence, FileModifiedHandler, convert_arguments
 
 
 @click.group()
@@ -169,6 +169,25 @@ def seq_cmd_list(sequence_name, searched, regex, full_word_match, match_case):
                 rich.print(f'\t\t{highlight(found_cmd, searched, "red")}')
             else:
                 rich.print(f'\t\t{highlight_regex(found_cmd, regex, "red")}')
+
+
+@sequence.command("edit",
+                  help="Will redirect you to edit file when you can edit sequences",
+                  context_settings=dict(ignore_unknown_options=True))
+def sequence_edit():
+    """
+    Adds command supplied in argument from sequence
+
+    Example:
+
+    bme sequence edit
+
+    @param sequence_name: Name of sequence
+    @param command: Command to add, use quotes around command optionally
+    @return:
+    """
+    rich.print(
+        f"[white]Please edit sequences in '[green]{default_sequences_location.absolute()}[/green]'")
 
 
 @sequence.command("add",
@@ -369,7 +388,9 @@ def rm(searched, regex, full_word_match, match_case):
 
 @cli.command("run", help="Searches and Runs Bookmark of your selection",
              context_settings=dict(ignore_unknown_options=True))
-@click.argument("searched", nargs=-1, type=click.UNPROCESSED, required=False,
+@click.argument("searched", type=click.UNPROCESSED, required=False,
+                default=None)
+@click.argument("arguments", nargs=-1, type=click.UNPROCESSED, required=False,
                 default=None)
 @click.option("-r", "--regex", help="Regex string to check with, please use quotes",
               required=False,
@@ -379,7 +400,7 @@ def rm(searched, regex, full_word_match, match_case):
 @click.option("-m", "--match-case", help="Match Case", default=False, is_flag=True)
 @click.option("-e", "--edit", help="Edit command before execution", default=False,
               is_flag=True)
-def run(searched, regex, full_word_match, match_case, edit):
+def run(searched, arguments, regex, full_word_match, match_case, edit):
     """
     This will run command, argument is used for search in commands for a match
 
@@ -397,6 +418,9 @@ def run(searched, regex, full_word_match, match_case, edit):
     Use following to execute command
     bme run ssh or bme run jiri@192 or bme run <whatever matches in command>
 
+    @param arguments: These arguments will be filled on positions of {} in command,
+     dict format is supported, you can use {some_name} but then need to use
+     some_name="same_value"
     @param edit: This flag will allow to edit before exec
     @param searched: Searched text in commands
     @param regex: Regex string to use to filter, can not be used together with argument
@@ -426,7 +450,21 @@ def run(searched, regex, full_word_match, match_case, edit):
         chosen = inquirer.text("Edit command before executing: ",
                                default=chosen).execute()
     rich.print(f"[red]Executing [/red][green]{chosen}[/green]")
-    os.system(chosen)
+    if len(arguments):
+        try:
+            convert = convert_arguments(arguments)
+            if convert[1]:
+                final = chosen.format(**convert[0])
+            else:
+                final = chosen.format(*convert[0])
+        except KeyError:
+            rich.print(
+                "[red]Key does not exist in command, or you used quotes without escaping. "
+                "Please always escape quotes with \\\"")
+            exit(1)
+    else:
+        final = chosen
+    os.system(final)
 
 
 @cli.command("list", help="Lists commands")

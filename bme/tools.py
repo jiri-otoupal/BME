@@ -1,6 +1,6 @@
 import re
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union, Tuple
 
 import rich
 from InquirerPy import inquirer
@@ -113,3 +113,19 @@ class FileModifiedHandler(FileSystemEventHandler):
     def on_modified(self, event):
         # only act on the change that we're looking for
         self.callback()  # call callback
+
+
+def convert_arguments(args: tuple) -> Union[Tuple[dict, bool], Tuple[tuple, bool]]:
+    """
+
+    @param args:
+    @return: dict/tuple, is_dict?
+    """
+    if "=" in "".join(args):
+        res_d = dict()
+        for el in args:
+            parts = el.split("=")
+            res_d[parts[0]] = parts[1]
+        return res_d, True
+    else:
+        return args, False
