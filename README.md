@@ -177,7 +177,7 @@ Example:
 
 Runs supplied sequence, and will do search for you if not found
 
-    bme sequence run {sequence_name}
+    bme sequence run {sequence_name} {optional-arguments}
 
 **Sequence Watch (!BETA!)**
 

@@ -1,6 +1,5 @@
 import datetime
 import os
-import time
 
 import rich
 
@@ -46,11 +45,12 @@ class Sequence(ParentType):
             return False
 
     @classmethod
-    def execute(cls, name, verbose: bool = False):
+    def execute(cls, name, arguments: tuple, verbose: bool = False):
         """
         Execute sequence in current workdir
+        @param arguments: Arguments for formatting
         @param verbose: Be verbose about what is happening in sequence
-        @param name:
+        @param name: Sequence Name
         @return:
         """
         rich.print(f"Executing Sequence '{name}'")
@@ -60,10 +60,12 @@ class Sequence(ParentType):
 
         sequence = sequences[name]
         cmds = sequence["cmds"]
+        from bme.tools import format_command
         for cmd in cmds:
             if verbose:
                 rich.print(f"Executing... {cmd}")
-            os.system(cmd)
+            f_cmd = format_command(arguments, cmd)
+            os.system(f_cmd)
         return True
 
     @classmethod
