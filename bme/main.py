@@ -182,8 +182,6 @@ def sequence_edit():
 
     bme sequence edit
 
-    @param sequence_name: Name of sequence
-    @param command: Command to add, use quotes around command optionally
     @return:
     """
     rich.print(
@@ -277,6 +275,7 @@ def sequence_watch(sequence_name, file, verbose):
 
     bme sequence watch my_sequence file_path
 
+    @param verbose: Verbose mode
     @param file:
     @param sequence_name:
     @return:
@@ -523,6 +522,12 @@ def cmd_list(searched, regex, full_word_match, match_case):
             rich.print(highlight(found_cmd, searched, "red"))
         else:
             rich.print(highlight_regex(found_cmd, regex, "red"))
+
+
+@cli.command("use", help="Switch Bookmark location")
+@click.argument("name", required=True)
+def use():
+    pass
 
 
 def main():
