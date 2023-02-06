@@ -4,7 +4,7 @@ import os
 
 from setuptools import setup, find_packages
 
-# get key package details from pycrosskit/__version__.py
+# get key package details from bme/__version__.py
 about = {}  # type: ignore
 here = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(here, "bme", "__version__.py")) as f:

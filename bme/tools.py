@@ -144,6 +144,11 @@ def format_command(arguments, cmd):
                 "[red]Key does not exist in command, or you used quotes without escaping. "
                 "Please always escape quotes with \\\"")
             exit(1)
+        except IndexError:
+            rich.print(
+                "[red]You can not mix dict style arguments and positional arguments[/red]")
+            rich.print(
+                "[red]Check if there is not more placeholders than commands if previous is not your case[/red]")
     else:
         final = cmd
     return final
