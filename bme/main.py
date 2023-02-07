@@ -332,6 +332,10 @@ def add(command):
     @param command: Command to add, use quotes around command optionally
     @return:
     """
+    if not command:
+        rich.print("[red]Command can not be empty[/red]")
+        return
+
     cmd_str = get_cmd_str(command)
     if Bookmark.append(cmd_str):
         rich.print(
@@ -378,6 +382,10 @@ def rm(searched, regex, full_word_match, match_case):
     @param match_case: If false(default) no case is considered during search
     @return:
     """
+    if not searched:
+        rich.print("[red]Command can not be empty[/red]")
+        return
+
     bookmarks, cmd_str, found = prepare_cmd_str(match_case, searched,
                                                 default_bookmarks_location)
 
@@ -430,6 +438,10 @@ def run(searched, arguments, regex, full_word_match, match_case, edit):
     @param match_case: If false(default) no case is considered during search
     @return:
     """
+    if not searched:
+        rich.print("[red]Command can not be empty[/red]")
+        return
+
     bookmarks, cmd_str, found = prepare_cmd_str(match_case, searched,
                                                 default_bookmarks_location)
 
