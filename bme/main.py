@@ -7,6 +7,7 @@ from InquirerPy import inquirer
 
 from bme.__version__ import __version_name__, __version__
 from bme.config import default_sequences_location, default_bookmarks_location
+from bme.config_mng import Config
 from bme.convertor import get_cmd_str
 from bme.init import init_all
 from bme.notifier.version_notifier import Notifier
@@ -430,6 +431,10 @@ def run(searched, arguments, regex, full_word_match, match_case, edit):
     @param match_case: If false(default) no case is considered during search
     @return:
     """
+    if searched is None:
+        rich.print("[red]Please enter at least one letter for search or use [/red]'bme list'")
+        return
+
     bookmarks, cmd_str, found = prepare_cmd_str(match_case, searched,
                                                 default_bookmarks_location)
 
@@ -442,8 +447,9 @@ def run(searched, arguments, regex, full_word_match, match_case, edit):
     if not len(found):
         rich.print("[red]No Commands found[/red]")
         return
+    cfg = Config.read()
 
-    if len(found) > 1:
+    if len(found) > 1 or not cfg["auto-execute"]:
         chosen = inquirer.select("Select cmd to execute:", found).execute()
     else:
         chosen = found.pop()

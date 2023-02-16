@@ -1,4 +1,3 @@
-import eventlet
 import lastversion
 import requests
 import rich
@@ -12,10 +11,10 @@ class Notifier:
     @classmethod
     def check_pypi_available(cls):
         try:
-            with eventlet.Timeout(0.2):
-                req = requests.get("https://pypi.org/", timeout=0.2)
-                return req.status_code == 200
-        except eventlet.timeout.Timeout or ConnectTimeout:
+            # TODO: Connection timeout fix
+            req = requests.get("https://pypi.org/", timeout=0.2)
+            return req.status_code == 200
+        except ConnectTimeout:
             return False
 
     @classmethod
