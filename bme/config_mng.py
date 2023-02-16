@@ -8,7 +8,7 @@ class Config:
     def init(cls):
         if default_config_location.exists():
             return
-        cfg = {"auto-execute": True}
+        cfg = {"auto-execute": True, "notify-update": True}
         with open(default_config_location, "w") as f:
             json.dump(cfg, f, indent=4)
 

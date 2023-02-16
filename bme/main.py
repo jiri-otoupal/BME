@@ -537,7 +537,9 @@ def use():
 
 
 def main():
-    Notifier.notify()
+    cfg = Config.read()
+    if cfg.get("notify-update", True):
+        Notifier.notify()
     init_all()
 
     cli()
