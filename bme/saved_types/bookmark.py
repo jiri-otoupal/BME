@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Optional
 
+import rich
 from escapejson import escapejson
 
 from bme.config import default_bookmarks_location
@@ -10,7 +11,10 @@ from bme.saved_types.parent_type import ParentType
 class Bookmark(ParentType):
     @classmethod
     def init(cls):
-        default_bookmarks_location.parent.mkdir(exist_ok=True)
+        try:
+            default_bookmarks_location.parent.mkdir(exist_ok=True)
+        except PermissionError:
+            rich.print("Failed to create folder .bme")
         if not default_bookmarks_location.exists():
             cls.overwrite({"cmds": []}, default_bookmarks_location)
 
