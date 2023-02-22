@@ -1,20 +1,8 @@
-import os
-from pathlib import Path
-
 import click
 import rich
 from InquirerPy import inquirer
-
 from bme.__version__ import __version_name__, __version__
 from bme.config import default_sequences_location, default_bookmarks_location
-from bme.config_mng import Config
-from bme.convertor import get_cmd_str
-from bme.init import init_all
-from bme.notifier.version_notifier import Notifier
-from bme.saved_types.bookmark import Bookmark
-from bme.saved_types.sequence import Sequence
-from bme.tools import browse_bookmarks, prepare_cmd_str, highlight, highlight_regex, \
-    process_found_n_remove, get_correct_sequence, FileModifiedHandler, format_command
 
 
 @click.group()
@@ -28,15 +16,15 @@ def cli():
 
 
 @cli.group()
-def sequence():
+def seq():
     """
     This is group for running sequential commands
     """
     pass
 
 
-@sequence.command("create", help="Adds Bookmark, use of quotes is optional",
-                  context_settings=dict(ignore_unknown_options=True))
+@seq.command("create", help="Adds Bookmark, use of quotes is optional",
+             context_settings=dict(ignore_unknown_options=True))
 @click.argument("name", type=str)
 def create_seq(name):
     """
@@ -49,6 +37,7 @@ def create_seq(name):
     @param name: Name of sequence to create
     @return:
     """
+    from bme.saved_types.sequence import Sequence
     if Sequence.create(name):
         rich.print(
             f"[green]Added New Sequence: '[white]{name}[/white]'[/green]")
@@ -57,8 +46,8 @@ def create_seq(name):
                    f"changed[/red]")
 
 
-@sequence.command("rm", help="Adds Bookmark, use of quotes is optional",
-                  context_settings=dict(ignore_unknown_options=True))
+@seq.command("rm", help="Adds Bookmark, use of quotes is optional",
+             context_settings=dict(ignore_unknown_options=True))
 @click.argument("name", type=str)
 def remove_seq(name):
     """
@@ -71,6 +60,7 @@ def remove_seq(name):
     @param name: Name of sequence to create
     @return:
     """
+    from bme.saved_types.sequence import Sequence
     if inquirer.confirm(
             f"Do you really want to remove sequence '{name}'?").execute():
         if Sequence.remove(name):
@@ -83,7 +73,7 @@ def remove_seq(name):
         rich.print("Canceled")
 
 
-@sequence.command("list", help="Lists commands")
+@seq.command("list", help="Lists commands")
 @click.argument("sequence_name", required=False, type=str)
 @click.argument("searched", required=False, default=None)
 @click.option("-r", "--regex", help="Regex string to check with, please use quotes",
@@ -129,6 +119,7 @@ def seq_cmd_list(sequence_name, searched, regex, full_word_match, match_case):
     @param match_case: If false(default) no case is considered during search
     @return:
     """
+    from bme.saved_types.sequence import Sequence
     if sequence_name:
         sequences = (sequence_name,)
     else:
@@ -146,9 +137,11 @@ def seq_cmd_list(sequence_name, searched, regex, full_word_match, match_case):
     for seq in sequences:
         if searched is not None or regex is not None:
 
+            from bme.tools import prepare_cmd_str
             bookmarks, cmd_str, found_cmds = prepare_cmd_str(match_case, searched,
                                                              default_sequences_location)
 
+            from bme.tools import browse_bookmarks
             found_cmds = browse_bookmarks(bookmarks, cmd_str, found_cmds, full_word_match,
                                           match_case,
                                           regex,
@@ -157,6 +150,7 @@ def seq_cmd_list(sequence_name, searched, regex, full_word_match, match_case):
                 return
 
         else:
+            from bme.saved_types.bookmark import Bookmark
             found_cmds = Bookmark.load_all(default_sequences_location)[seq]["cmds"]
 
         rich.print(f"[white]Sequence: [green]'{seq}'[/green][/white]")
@@ -167,14 +161,16 @@ def seq_cmd_list(sequence_name, searched, regex, full_word_match, match_case):
         rich.print("\t[bold]Commands:[/bold]")
         for found_cmd in found_cmds:
             if not regex:
+                from bme.tools import highlight
                 rich.print(f'\t\t{highlight(found_cmd, searched, "red")}')
             else:
+                from bme.tools import highlight_regex
                 rich.print(f'\t\t{highlight_regex(found_cmd, regex, "red")}')
 
 
-@sequence.command("edit",
-                  help="Will redirect you to edit file when you can edit sequences",
-                  context_settings=dict(ignore_unknown_options=True))
+@seq.command("edit",
+             help="Will redirect you to edit file when you can edit sequences",
+             context_settings=dict(ignore_unknown_options=True))
 def sequence_edit():
     """
     Adds command supplied in argument from sequence
@@ -189,9 +185,9 @@ def sequence_edit():
         f"[white]Please edit sequences in '[green]{default_sequences_location.absolute()}[/green]'")
 
 
-@sequence.command("add",
-                  help="Adds Command to sequence, use of quotes is optional",
-                  context_settings=dict(ignore_unknown_options=True))
+@seq.command("add",
+             help="Adds Command to sequence, use of quotes is optional",
+             context_settings=dict(ignore_unknown_options=True))
 @click.argument("sequence_name", type=str)
 @click.argument("command", nargs=-1, type=click.UNPROCESSED)
 def sequence_add(sequence_name, command):
@@ -211,9 +207,11 @@ def sequence_add(sequence_name, command):
             f"[red]Can not add empty command to sequence [/red]'[white]{sequence_name}[/white]'")
         return
 
+    from bme.tools import get_correct_sequence
     sequence_name = get_correct_sequence(sequence_name)
-
+    from bme.convertor import get_cmd_str
     cmd_str = get_cmd_str(command)
+    from bme.saved_types.sequence import Sequence
     if Sequence.add_cmd(sequence_name, cmd_str):
         rich.print(
             f"[green]Added New command: '[white]{' '.join(command)}[/white]' to sequence "
@@ -226,8 +224,8 @@ def sequence_add(sequence_name, command):
             f"changed[/red]")
 
 
-@sequence.command("pop", help="Adds Command to sequence, use of quotes is optional",
-                  context_settings=dict(ignore_unknown_options=True))
+@seq.command("pop", help="Adds Command to sequence, use of quotes is optional",
+             context_settings=dict(ignore_unknown_options=True))
 @click.argument("sequence_name", type=str)
 @click.argument("searched", nargs=-1, type=click.UNPROCESSED)
 @click.option("-r", "--regex", help="Regex string to check with, please use quotes",
@@ -246,6 +244,7 @@ def sequence_pop(sequence_name, searched, regex, full_word_match, match_case):
 
     @return:
     """
+    from bme.tools import prepare_cmd_str
     bookmarks, cmd_str, found = prepare_cmd_str(match_case, searched,
                                                 default_sequences_location)
 
@@ -254,17 +253,20 @@ def sequence_pop(sequence_name, searched, regex, full_word_match, match_case):
             f"[red]Can not remove empty command from sequence [/red]'[white]{sequence_name}[/white]'")
         return
 
+    from bme.tools import get_correct_sequence
     sequence_name = get_correct_sequence(sequence_name)
 
+    from bme.tools import browse_bookmarks
     found = browse_bookmarks(bookmarks, cmd_str, found, full_word_match, match_case,
                              regex,
                              searched, sequence_name)
 
+    from bme.tools import process_found_n_remove
     process_found_n_remove(found, default_sequences_location, sequence_name)
 
 
-@sequence.command("watch", help="Adds Command to sequence, use of quotes is optional",
-                  context_settings=dict(ignore_unknown_options=True))
+@seq.command("watch", help="Adds Command to sequence, use of quotes is optional",
+             context_settings=dict(ignore_unknown_options=True))
 @click.argument("sequence_name", type=str)
 @click.argument("file", type=str)
 @click.option("-v", "--verbose", required=False, help="Verbose execution of commands")
@@ -281,17 +283,21 @@ def sequence_watch(sequence_name, file, verbose):
     @param sequence_name:
     @return:
     """
+    from pathlib import Path
     if not Path(file).exists():
         rich.print(f"File does not exist in path {file}")
         return
 
+    from bme.tools import get_correct_sequence
     sequence_name = get_correct_sequence(sequence_name)
+    from bme.saved_types.sequence import Sequence
     callback = lambda: Sequence.execute(sequence_name, verbose=verbose)
+    from bme.tools import FileModifiedHandler
     FileModifiedHandler(Path(file).absolute(), callback)
 
 
-@sequence.command("run", help="Adds Command to sequence, use of quotes is optional",
-                  context_settings=dict(ignore_unknown_options=True))
+@seq.command("run", help="Adds Command to sequence, use of quotes is optional",
+             context_settings=dict(ignore_unknown_options=True))
 @click.argument("sequence_name", type=str)
 @click.argument("arguments", nargs=-1, type=click.UNPROCESSED, required=False,
                 default=None)
@@ -309,8 +315,9 @@ def sequence_run(sequence_name, arguments, verbose):
     @param verbose:
     @return:
     """
+    from bme.tools import get_correct_sequence
     sequence_name = get_correct_sequence(sequence_name)
-
+    from bme.saved_types.sequence import Sequence
     if Sequence.execute(sequence_name, arguments=arguments, verbose=verbose):
         pass
     else:
@@ -333,6 +340,8 @@ def add(command):
     @param command: Command to add, use quotes around command optionally
     @return:
     """
+    from bme.saved_types.bookmark import Bookmark
+    from bme.convertor import get_cmd_str
     cmd_str = get_cmd_str(command)
     if Bookmark.append(cmd_str):
         rich.print(
@@ -379,13 +388,16 @@ def rm(searched, regex, full_word_match, match_case):
     @param match_case: If false(default) no case is considered during search
     @return:
     """
+    from bme.tools import prepare_cmd_str
     bookmarks, cmd_str, found = prepare_cmd_str(match_case, searched,
                                                 default_bookmarks_location)
 
+    from bme.tools import browse_bookmarks
     found = browse_bookmarks(bookmarks, cmd_str, found, full_word_match, match_case,
                              regex,
                              searched)
 
+    from bme.tools import process_found_n_remove
     process_found_n_remove(found, default_bookmarks_location)
 
 
@@ -431,13 +443,16 @@ def run(searched, arguments, regex, full_word_match, match_case, edit):
     @param match_case: If false(default) no case is considered during search
     @return:
     """
+    from bme.config_mng import Config
     if searched is None:
         rich.print("[red]Please enter at least one letter for search or use [/red]'bme list'")
         return
 
+    from bme.tools import prepare_cmd_str
     bookmarks, cmd_str, found = prepare_cmd_str(match_case, searched,
                                                 default_bookmarks_location)
 
+    from bme.tools import browse_bookmarks
     found = browse_bookmarks(bookmarks, cmd_str, found, full_word_match, match_case,
                              regex,
                              searched)
@@ -458,7 +473,9 @@ def run(searched, arguments, regex, full_word_match, match_case, edit):
         chosen = inquirer.text("Edit command before executing: ",
                                default=chosen).execute()
     rich.print(f"[red]Executing [/red][green]{chosen}[/green]")
+    from bme.tools import format_command
     final = format_command(arguments, chosen)
+    import os
     os.system(final)
 
 
@@ -505,9 +522,11 @@ def cmd_list(searched, regex, full_word_match, match_case):
     """
     if searched is not None or regex is not None:
 
+        from bme.tools import prepare_cmd_str
         bookmarks, cmd_str, found_cmds = prepare_cmd_str(match_case, searched,
                                                          default_bookmarks_location)
 
+        from bme.tools import browse_bookmarks
         found_cmds = browse_bookmarks(bookmarks, cmd_str, found_cmds, full_word_match,
                                       match_case,
                                       regex,
@@ -516,6 +535,7 @@ def cmd_list(searched, regex, full_word_match, match_case):
             return
 
     else:
+        from bme.saved_types.bookmark import Bookmark
         found_cmds = Bookmark.load_all(default_bookmarks_location)["cmds"]
 
     if not len(found_cmds):
@@ -525,8 +545,10 @@ def cmd_list(searched, regex, full_word_match, match_case):
     rich.print("[bold]Commands:[/bold]")
     for found_cmd in found_cmds:
         if not regex:
+            from bme.tools import highlight
             rich.print(highlight(found_cmd, searched, "red"))
         else:
+            from bme.tools import highlight_regex
             rich.print(highlight_regex(found_cmd, regex, "red"))
 
 
@@ -537,9 +559,12 @@ def use():
 
 
 def main():
+    from bme.config_mng import Config
     cfg = Config.read()
     if cfg.get("notify-update", True):
+        from bme.notifier.version_notifier import Notifier
         Notifier.notify()
+    from bme.init import init_all
     init_all()
 
     cli()
