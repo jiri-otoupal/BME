@@ -4,6 +4,7 @@ from pathlib import Path
 
 import requests
 import rich
+from filecache import filecache
 
 
 class ParentType:
@@ -12,8 +13,7 @@ class ParentType:
         from bme.config_mng import Config
         cfg = Config.read()
         if not cfg.get("use-daemon", False) or force_json:
-            with open(str(path), "w") as f:
-                json.dump(td, f, indent=4)
+            cls.dump_json(path, td)
             return path
 
         else:
@@ -26,14 +26,16 @@ class ParentType:
                 raise Exception("BME Daemon not running")
 
     @classmethod
+    def dump_json(cls, path, td):
+        with open(str(path), "w") as f:
+            json.dump(td, f, indent=4)
+
+    @classmethod
     def load_all(cls, path, force_json=False) -> dict:
         from bme.config_mng import Config
         cfg = Config.read()
         if not cfg.get("use-daemon", False) or force_json:
-            with open(str(path), "r") as f:
-                creds = json.load(f)
-                logging.debug(f"Loaded {creds}")
-            return creds
+            return cls.read_json(path)
         else:
             try:
                 port = cfg.get("daemon-port", 9837)
@@ -42,3 +44,11 @@ class ParentType:
             except requests.exceptions.ConnectionError:
                 rich.print("[red]BME Daemon not running[/red]")
                 raise Exception("BME Daemon not running")
+
+    @classmethod
+    @filecache(60)
+    def read_json(cls, path):
+        with open(str(path), "r") as f:
+            creds = json.load(f)
+            logging.debug(f"Loaded {creds}")
+        return creds
