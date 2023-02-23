@@ -4,6 +4,7 @@ from bme.config import default_config_location
 
 
 class Config:
+    __current_config__ = None
     default_cfg = {"auto-execute": True, "notify-update": True, "use-daemon": False,
                    "daemon-port": 9837, "hostname": "localhost"}
 
@@ -16,6 +17,7 @@ class Config:
 
     @classmethod
     def write_config(cls, cfg):
+        cls.__current_config__ = None
         with open(default_config_location, "w") as f:
             json.dump(cfg, f, indent=4)
 
@@ -34,5 +36,10 @@ class Config:
     @classmethod
     def read(cls) -> dict:
         cls.init()
-        with open(default_config_location, "r") as f:
-            return json.load(f)
+        if cls.__current_config__ is None:
+            with open(default_config_location, "r") as f:
+                read = json.load(f)
+                cls.__current_config__ = read
+                return read
+        else:
+            return cls.__current_config__
