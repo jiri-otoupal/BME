@@ -4,10 +4,11 @@ from pathlib import Path
 
 import requests
 import rich
-from filecache import filecache
 
 
 class ParentType:
+    __current_json__ = None
+
     @classmethod
     def overwrite(cls, td: dict, path: Path, force_json=False):
         from bme.config_mng import Config
@@ -27,6 +28,8 @@ class ParentType:
 
     @classmethod
     def dump_json(cls, path, td):
+        # Invalidate cache
+        cls.__current_json__ = None
         with open(str(path), "w") as f:
             json.dump(td, f, indent=4)
 
@@ -46,9 +49,12 @@ class ParentType:
                 raise Exception("BME Daemon not running")
 
     @classmethod
-    @filecache(60)
     def read_json(cls, path):
-        with open(str(path), "r") as f:
-            creds = json.load(f)
-            logging.debug(f"Loaded {creds}")
-        return creds
+        if cls.__current_json__ is None:
+            with open(str(path), "r") as f:
+                creds = json.load(f)
+                logging.debug(f"Loaded {creds}")
+                cls.__current_json__ = creds
+            return creds
+
+        return cls.__current_json__
