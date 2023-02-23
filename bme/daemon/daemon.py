@@ -10,7 +10,8 @@ class Daemon:
         from bme.daemon.api import app
         cfg = Config.read()
         port = cfg.get("daemon-port", 9837)
-        uvicorn.run(app, host="localhost", port=port)
+        host = cfg.get("hostname", "localhost")
+        uvicorn.run(app, host=host, port=port)
 
 
 if __name__ == "__main__":

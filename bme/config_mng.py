@@ -5,7 +5,7 @@ from bme.config import default_config_location
 
 class Config:
     default_cfg = {"auto-execute": True, "notify-update": True, "use-daemon": False,
-                   "daemon-port": 9837}
+                   "daemon-port": 9837, "hostname": "localhost"}
 
     @classmethod
     def init(cls):
