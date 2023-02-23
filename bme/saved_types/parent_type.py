@@ -23,8 +23,9 @@ class ParentType:
                 requests.post(f"http://localhost:{port}/{cls.__name__.lower()}", json=td)
                 return path
             except requests.exceptions.ConnectionError:
-                rich.print("[red]BME Daemon not running[/red]")
-                raise Exception("BME Daemon not running")
+                rich.print(
+                    "[red]BME Daemon not running[/red] please start daemon using 'bme daemon start'")
+                return path
 
     @classmethod
     def dump_json(cls, path, td):
@@ -45,8 +46,10 @@ class ParentType:
                 ret = requests.get(f"http://localhost:{port}/{cls.__name__.lower()}s")
                 return ret.json()
             except requests.exceptions.ConnectionError:
-                rich.print("[red]BME Daemon not running[/red]")
-                raise Exception("BME Daemon not running")
+                rich.print(
+                    "[red]BME Daemon not running[/red] please start daemon using 'bme daemon start'")
+                raise Exception(
+                    "BME Daemon not running please start daemon using 'bme daemon start'")
 
     @classmethod
     def read_json(cls, path):
