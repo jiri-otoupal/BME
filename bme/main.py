@@ -3,6 +3,7 @@ import rich
 from InquirerPy import inquirer
 from bme.__version__ import __version_name__, __version__
 from bme.config import default_sequences_location, default_bookmarks_location
+from bme.daemon.daemon import Daemon
 
 
 @click.group()
@@ -550,6 +551,17 @@ def cmd_list(searched, regex, full_word_match, match_case):
         else:
             from bme.tools import highlight_regex
             rich.print(highlight_regex(found_cmd, regex, "red"))
+
+
+@cli.group()
+def daemon():
+    pass
+
+
+@daemon.command()
+def start():
+    rich.print("Starting BME Daemon")
+    Daemon.start()
 
 
 @cli.command("use", help="Switch Bookmark location")
