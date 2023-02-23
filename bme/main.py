@@ -3,7 +3,6 @@ import rich
 from InquirerPy import inquirer
 from bme.__version__ import __version_name__, __version__
 from bme.config import default_sequences_location, default_bookmarks_location
-from bme.daemon.daemon import Daemon
 
 
 @click.group()
@@ -561,6 +560,7 @@ def daemon():
 @daemon.command()
 def start():
     rich.print("Starting BME Daemon")
+    from bme.daemon.daemon import Daemon
     Daemon.start()
 
 
