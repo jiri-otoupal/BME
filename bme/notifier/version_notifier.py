@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import lastversion
 import requests
 import rich
@@ -5,6 +7,7 @@ import semantic_version
 from requests import ConnectTimeout
 
 from bme import __version__
+from bme.config_mng import Config
 
 
 class Notifier:
@@ -29,6 +32,15 @@ class Notifier:
 
     @classmethod
     def notify(cls):
+        config = Config.read()
+        dt = datetime.now()
+
+        if (dt - datetime.fromtimestamp(
+                config.get("last-check", 1677884000))).seconds < 60 * 60 * 8:
+            return
+
+        config["last-check"] = datetime.timestamp(dt)
+
         if cls.check_pypi_available() and not cls.is_last_version():
             last = cls.get_last_version()
             rich.print(
