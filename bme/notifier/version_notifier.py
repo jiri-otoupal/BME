@@ -2,7 +2,7 @@ import lastversion
 import requests
 import rich
 import semantic_version
-from requests import ConnectTimeout
+from requests import ConnectTimeout, ReadTimeout
 
 from bme import __version__
 
@@ -14,7 +14,7 @@ class Notifier:
             # TODO: Connection timeout fix
             req = requests.get("https://pypi.org/", timeout=0.2)
             return req.status_code == 200
-        except ConnectTimeout:
+        except (ConnectTimeout, ReadTimeout):
             return False
 
     @classmethod
