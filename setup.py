@@ -26,7 +26,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     python_requires=">=3.7,<4",
-    install_requires=["click", "rich", "inquirerpy", "lastversion",
+    install_requires=["click", "rich", "inquirerpy", "lastversion", "uvicorn", "fastapi",
                       "requests", "semantic_version", "escapejson", "watchdog"],
     extras_require={
         "dev": ["black==22.*"],

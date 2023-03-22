@@ -133,23 +133,23 @@ These sequences work from everywhere and execution is always in your current wor
 
 **Create Sequence**
 
-`bme sequence create {name}`
+`bme seq create {name}`
 
 Example:
 
-`bme sequence create my_sequence`
+`bme seq create my_sequence`
 
 **Remove Sequence**
 
-`bme sequence rm {name}`
+`bme seq rm {name}`
 
 Example
 
-`bme sequence rm my_sequence`
+`bme seq rm my_sequence`
 
 **Edit Sequence**
 
-`bme sequence edit`
+`bme seq edit`
 
 This will display location of json with sequences
 
@@ -157,21 +157,21 @@ This will display location of json with sequences
 
 This will add command to sequence with use of variadic arguments
 
-    bme sequence add {sequence_name} {command...}
+    bme seq add {sequence_name} {command...}
 
 Example:
 
-    bme sequence add my_sequence ssh jiri@192.168.1.0
+    bme seq add my_sequence ssh jiri@192.168.1.0
 
 **Pop Command from Sequence**
 
 This will pop command from sequence with use of variadic arguments
 
-    bme sequence pop {sequence_name} {command...}
+    bme seq pop {sequence_name} {command...}
 
 Example:
 
-    bme sequence pop my_sequence ssh jiri@192.168.1.0
+    bme seq pop my_sequence ssh jiri@192.168.1.0
 
 **Sequence Run**
 

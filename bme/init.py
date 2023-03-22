@@ -7,3 +7,4 @@ def init_all():
     Bookmark.init()
     Sequence.init()
     Config.init()
+    Config.fix_integrity()

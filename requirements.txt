@@ -1,3 +1,11 @@
 click~=8.1.3
 inquirerpy~=0.3.4
 rich~=12.5.1
+fastapi~=0.92.0
+uvicorn~=0.20.0
+bme~=1.2.6
+lastversion~=2.4.8
+requests~=2.28.1
+watchdog~=2.2.0
+escapejson~=1.0
+setuptools~=60.2.0
