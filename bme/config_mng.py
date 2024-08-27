@@ -13,7 +13,7 @@ class Config:
     def init(cls):
         if default_config_location.exists():
             return
-        Path(default_config_location).mkdir(parents=True, exist_ok=True)
+        Path(default_config_location).parent.mkdir(parents=True, exist_ok=True)
         cls.write_config(cls.default_cfg)
 
     @classmethod
